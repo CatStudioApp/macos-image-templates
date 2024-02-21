@@ -15,7 +15,7 @@ task:
   timeout_in: 3h
   update_script: 
     - brew update && brew upgrade
-    - brew install packer cirruslabs/cli/tart
+    - brew install packer CatStudioApp/cli/tart
   info_script:
     - tart --version
     - packer --version
@@ -25,7 +25,7 @@ task:
   disable_sip_script:
     - packer build -var vm_name=sonoma-vanilla templates/disable-sip.pkr.hcl
   push_script:
-    - tart push sonoma-vanilla ghcr.io/cirruslabs/macos-sonoma-vanilla:latest ghcr.io/cirruslabs/macos-sonoma-vanilla:14.3
+    - tart push sonoma-vanilla ghcr.io/CatStudioApp/macos-sonoma-vanilla:latest ghcr.io/CatStudioApp/macos-sonoma-vanilla:14.3
   always:
     cleanup_script:
       - tart delete sonoma-vanilla || true
@@ -47,13 +47,13 @@ task:
     - packer init templates/xcode.pkr.hcl
     - packer build -var-file="variables.pkrvars.hcl" templates/xcode.pkr.hcl
   push_base_script:
-    - tart push sonoma-base ghcr.io/cirruslabs/macos-sonoma-base:latest
+    - tart push sonoma-base ghcr.io/CatStudioApp/macos-sonoma-base:latest
   push_xcode_script:
-    - tart push sonoma-xcode:$XCODE_VERSION ghcr.io/cirruslabs/macos-sonoma-xcode:$XCODE_VERSION ghcr.io/cirruslabs/macos-sonoma-xcode:latest
+    - tart push sonoma-xcode:$XCODE_VERSION ghcr.io/CatStudioApp/macos-sonoma-xcode:$XCODE_VERSION ghcr.io/CatStudioApp/macos-sonoma-xcode:latest
   push_base_ecr_script:
-    - tart push sonoma-base public.ecr.aws/cirruslabs/macos:sonoma-base
+    - tart push sonoma-base public.ecr.aws/CatStudioApp/macos:sonoma-base
   push_xcode_ecr_script:
-    - tart push sonoma-xcode:$XCODE_VERSION public.ecr.aws/cirruslabs/macos:sonoma-xcode-$XCODE_VERSION public.ecr.aws/cirruslabs/macos:sonoma-xcode
+    - tart push sonoma-xcode:$XCODE_VERSION public.ecr.aws/CatStudioApp/macos:sonoma-xcode-$XCODE_VERSION public.ecr.aws/CatStudioApp/macos:sonoma-xcode
   always:
     cleanup_script:
       - tart delete sonoma-base || true
@@ -68,24 +68,24 @@ task:
     - tart --version
     - packer --version
   pull_base_script:
-    - tart pull ghcr.io/cirruslabs/macos-sonoma-base:latest
-    - tart clone ghcr.io/cirruslabs/macos-sonoma-base:latest sonoma-base
+    - tart pull ghcr.io/CatStudioApp/macos-sonoma-base:latest
+    - tart clone ghcr.io/CatStudioApp/macos-sonoma-base:latest sonoma-base
   build_script:
     - packer init templates/xcode.pkr.hcl
     - packer build -var-file="variables.pkrvars.hcl" -var xcode_version="$CIRRUS_TAG" templates/xcode.pkr.hcl
   push_script: |
     if [[ $CIRRUS_TAG == *"beta"* ]]
     then
-      tart push sonoma-xcode:$CIRRUS_TAG ghcr.io/cirruslabs/macos-sonoma-xcode:$CIRRUS_TAG
+      tart push sonoma-xcode:$CIRRUS_TAG ghcr.io/CatStudioApp/macos-sonoma-xcode:$CIRRUS_TAG
     else
-      tart push sonoma-xcode:$CIRRUS_TAG ghcr.io/cirruslabs/macos-sonoma-xcode:$CIRRUS_TAG ghcr.io/cirruslabs/macos-sonoma-xcode:latest
+      tart push sonoma-xcode:$CIRRUS_TAG ghcr.io/CatStudioApp/macos-sonoma-xcode:$CIRRUS_TAG ghcr.io/CatStudioApp/macos-sonoma-xcode:latest
     fi
   push_ecr_script: |
     if [[ $CIRRUS_TAG == *"beta"* ]]
     then
-      tart push sonoma-xcode:$CIRRUS_TAG public.ecr.aws/cirruslabs/macos:sonoma-xcode-$CIRRUS_TAG
+      tart push sonoma-xcode:$CIRRUS_TAG public.ecr.aws/CatStudioApp/macos:sonoma-xcode-$CIRRUS_TAG
     else
-      tart push sonoma-xcode:$CIRRUS_TAG public.ecr.aws/cirruslabs/macos:sonoma-xcode-$CIRRUS_TAG public.ecr.aws/cirruslabs/macos:sonoma-xcode
+      tart push sonoma-xcode:$CIRRUS_TAG public.ecr.aws/CatStudioApp/macos:sonoma-xcode-$CIRRUS_TAG public.ecr.aws/CatStudioApp/macos:sonoma-xcode
     fi
   always:
     cleanup_script:

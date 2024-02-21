@@ -41,8 +41,8 @@ build {
       "brew --version",
       "brew update",
       "brew upgrade",
-      "brew install curl wget unzip zip ca-certificates",
-      "sudo softwareupdate --install-rosetta --agree-to-license"
+      "brew install curl wget unzip zip ca-certificates"
+//      "sudo softwareupdate --install-rosetta --agree-to-license"
     ]
   }
 
@@ -55,22 +55,15 @@ build {
     inline = [
       "source ~/.zprofile",
       "brew install homebrew/cask-versions/temurin17",
-      "echo 'export ANDROID_HOME=$HOME/android-sdk' >> ~/.zprofile",
-      "echo 'export ANDROID_SDK_ROOT=$ANDROID_HOME' >> ~/.zprofile",
-      "echo 'export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator' >> ~/.zprofile",
-      "source ~/.zprofile",
-      "wget -q https://dl.google.com/android/repository/commandlinetools-mac-${var.android_sdk_tools_version}_latest.zip -O android-sdk-tools.zip",
-      "mkdir -p $ANDROID_HOME/cmdline-tools/",
-      "unzip -q android-sdk-tools.zip -d $ANDROID_HOME/cmdline-tools/",
-      "rm android-sdk-tools.zip",
-      "mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest",
-      "yes | sdkmanager --licenses",
-      "yes | sdkmanager 'platform-tools' 'platforms;android-33' 'build-tools;34.0.0' 'ndk;25.2.9519653'"
+      "brew install rustup-init",
+      "rustup-init -y",
+      "source ~/.cargo/env",
+      "cargo install sccache typeshare-cli"
     ]
   }
 
   provisioner "file" {
-    source      = pathexpand("~/Downloads/Xcode_${var.xcode_version}.xip")
+    source      = "/Volumes/QuickMac/Downloads/Xcode_15.2.xip" // pathexpand("~/Downloads/Xcode_${var.xcode_version}.xip")
     destination = "/Users/admin/Downloads/Xcode_${var.xcode_version}.xip"
   }
 
@@ -81,24 +74,12 @@ build {
       "brew install xcodesorg/made/xcodes",
       "xcodes version",
       "xcodes install ${var.xcode_version} --experimental-unxip --path /Users/admin/Downloads/Xcode_${var.xcode_version}.xip --select --empty-trash",
-      "xcodebuild -downloadAllPlatforms",
+      "xcodebuild -downloadPlatform iOS",
+      // "xcodebuild -downloadAllPlatforms",
       "xcodebuild -runFirstLaunch",
     ]
   }
-  provisioner "shell" {
-    inline = [
-      "source ~/.zprofile",
-      "echo 'export FLUTTER_HOME=$HOME/flutter' >> ~/.zprofile",
-      "echo 'export PATH=$HOME/flutter:$HOME/flutter/bin/:$HOME/flutter/bin/cache/dart-sdk/bin:$PATH' >> ~/.zprofile",
-      "source ~/.zprofile",
-      "git clone https://github.com/flutter/flutter.git $FLUTTER_HOME",
-      "cd $FLUTTER_HOME",
-      "git checkout stable",
-      "flutter doctor --android-licenses",
-      "flutter doctor",
-      "flutter precache",
-    ]
-  }
+
   provisioner "shell" {
     inline = [
       "source ~/.zprofile",
@@ -125,6 +106,7 @@ build {
       "sudo security delete-certificate -Z FF6797793A3CD798DC5B2ABEF56F73EDC9F83A64 /Library/Keychains/System.keychain",
       "curl -o add-certificate.swift https://raw.githubusercontent.com/actions/runner-images/fb3b6fd69957772c1596848e2daaec69eabca1bb/images/macos/provision/configuration/add-certificate.swift",
       "swiftc add-certificate.swift",
+      "sudo mkdir -p /usr/local/bin",
       "sudo mv ./add-certificate /usr/local/bin/add-certificate",
       "curl -o AppleWWDRCAG3.cer https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer",
       "curl -o DeveloperIDG2CA.cer https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer",
@@ -137,7 +119,6 @@ build {
   provisioner "shell" {
     inline = [
       "source ~/.zprofile",
-      "flutter doctor"
     ]
   }
 }
